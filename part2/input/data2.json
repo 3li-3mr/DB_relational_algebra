@@ -1,0 +1,21 @@
+{
+  "Employee": [
+    {"EmpID": 1, "Name": "Ali",  "DeptID": 10, "Salary": 5000},
+    {"EmpID": 2, "Name": "Mona", "DeptID": 20, "Salary": 6000},
+    {"EmpID": 3, "Name": "Omar", "DeptID": 10, "Salary": 7000},
+    {"EmpID": 4, "Name": "Sara", "DeptID": 30, "Salary": 4000},
+    {"EmpID": 5, "Name": "Hany", "DeptID": 20, "Salary": 6000},
+    {"EmpID": 6, "Name": "Nour", "DeptID": 10, "Salary": 5000}
+  ],
+  "Department": [
+    {"DeptID": 10, "DName": "IT",    "City": "Cairo"},
+    {"DeptID": 20, "DName": "HR",    "City": "Alex"},
+    {"DeptID": 30, "DName": "Sales", "City": "Cairo"},
+    {"DeptID": 40, "DName": "Legal", "City": "Giza"}
+  ],
+  "Manager": [
+    {"EmpID": 2, "Name": "Mona",  "DeptID": 20, "Salary": 6000},
+    {"EmpID": 3, "Name": "Omar",  "DeptID": 10, "Salary": 7000},
+    {"EmpID": 7, "Name": "Laila", "DeptID": 30, "Salary": 9000}
+  ]
+}
