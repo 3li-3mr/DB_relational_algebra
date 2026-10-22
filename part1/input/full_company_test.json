@@ -1,0 +1,115 @@
+{
+  "entities": [
+    {
+      "name": "Employee",
+      "attributes": [
+        { "name": "Ssn", "isPrimaryKey": true },
+        { "name": "Name", "composite": ["Fname", "Minit", "Lname"] },
+        { "name": "Bdate" },
+        { "name": "Address", "composite": ["Street", "City"] },
+        { "name": "Salary" }
+      ]
+    },
+    {
+      "name": "Department",
+      "attributes": [
+        { "name": "Dnumber", "isPrimaryKey": true },
+        { "name": "Dname" },
+        { "name": "TotalEmployees", "isDerived": true },
+        { "name": "Location", "isMultiValued": true }
+      ]
+    },
+    {
+      "name": "Project",
+      "attributes": [
+        { "name": "Pnumber", "isPrimaryKey": true },
+        { "name": "Pname" },
+        { "name": "Plocation" }
+      ]
+    },
+    {
+      "name": "Dependent",
+      "isWeak": true,
+      "attributes": [
+        { "name": "Dependent_name", "isPartialKey": true },
+        { "name": "Sex" },
+        { "name": "Bdate" },
+        { "name": "Relationship" }
+      ]
+    },
+    {
+      "name": "Supplier",
+      "attributes": [
+        { "name": "Sid", "isPrimaryKey": true },
+        { "name": "Sname" }
+      ]
+    },
+    {
+      "name": "Part",
+      "attributes": [
+        { "name": "Pid", "isPrimaryKey": true },
+        { "name": "Pdesc" }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "name": "Manages",
+      "entity1": "Employee",
+      "entity2": "Department",
+      "cardinality": "1:1",
+      "entity1Participation": "partial",
+      "entity2Participation": "total",
+      "attributes": [
+        { "name": "Mgr_start_date" }
+      ]
+    },
+    {
+      "name": "Works_For",
+      "entity1": "Employee",
+      "entity2": "Department",
+      "cardinality": "N:1"
+    },
+    {
+      "name": "Supervision",
+      "entity1": "Employee",
+      "entity2": "Employee",
+      "cardinality": "N:1"
+    },
+    {
+      "name": "Controls",
+      "entity1": "Department",
+      "entity2": "Project",
+      "cardinality": "1:N"
+    },
+    {
+      "name": "Works_On",
+      "entity1": "Employee",
+      "entity2": "Project",
+      "cardinality": "M:N",
+      "attributes": [
+        { "name": "Hours" }
+      ]
+    },
+    {
+      "name": "Dependents_Of",
+      "isIdentifying": true,
+      "entity1": "Employee",
+      "entity2": "Dependent",
+      "cardinality": "1:N",
+      "entity1Participation": "partial",
+      "entity2Participation": "total"
+    },
+    {
+      "name": "Supply",
+      "participants": [
+        { "entity": "Supplier", "cardinality": "M", "participation": "partial" },
+        { "entity": "Project", "cardinality": "N", "participation": "partial" },
+        { "entity": "Part", "cardinality": "P", "participation": "partial" }
+      ],
+      "attributes": [
+        { "name": "Quantity" }
+      ]
+    }
+  ]
+}
