@@ -13,7 +13,16 @@ class Database(BaseModel):
 
     @classmethod
     def from_dict(cls, data: Dict[str, List[Dict[str, Any]]]) -> "Database":
-        pass
+        tables = {}
+        for table_name in data:
+            rows = data[table_name]
+            columns = []
+            for row in rows:
+                for key in row:
+                    if key not in columns:
+                        columns.append(key)
+            tables[table_name] = Relation(name=table_name, columns=columns, rows=rows)
+        return cls(tables=tables)
 
 
 class QueryNode(BaseModel):
