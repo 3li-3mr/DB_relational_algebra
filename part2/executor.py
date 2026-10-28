@@ -43,9 +43,19 @@ class QueryExecutor:
             values.append(row.get(col))
         return tuple(values)
 
-    def _check_same_columns(self, left: Relation, right: Relation) -> None:
-        if sorted(left.columns) != sorted(right.columns):
-            raise ValueError("Relations must have the same columns")
+    def _normalize_set_operands(self, left: Relation, right: Relation) -> tuple[list[str], list[dict]]:
+        if len(left.columns) != len(right.columns):
+            raise ValueError("Relations must have the same number of columns for set operations")
+
+        columns = list(left.columns)
+        if set(left.columns) == set(right.columns):
+            right_rows = [{col: row.get(col) for col in columns} for row in right.rows]
+        else:
+            right_rows = [
+                {columns[i]: row.get(right.columns[i]) for i in range(len(columns))}
+                for row in right.rows
+            ]
+        return columns, right_rows
 
     def _select(self, relation: Relation, condition: str) -> Relation:
         cond = Condition(condition)
@@ -109,6 +119,9 @@ class QueryExecutor:
         cond = Condition(condition)
         left_name = left.name or "left"
         right_name = right.name or "right"
+        if left_name == right_name:
+            left_name = left_name + "_1"
+            right_name = right_name + "_2"
 
         left_out = []
         for col in left.columns:
@@ -144,26 +157,20 @@ class QueryExecutor:
         return Relation(name="", columns=columns, rows=rows)
 
     def _union(self, left: Relation, right: Relation) -> Relation:
-        self._check_same_columns(left, right)
-        columns = list(left.columns)
+        columns, right_rows = self._normalize_set_operands(left, right)
         rows = []
         seen = set()
-        for row in left.rows + right.rows:
+        for row in left.rows + right_rows:
             key = self._row_key(row, columns)
             if key not in seen:
                 seen.add(key)
-                new_row = {}
-                for col in columns:
-                    new_row[col] = row.get(col)
+                new_row = {col: row.get(col) for col in columns}
                 rows.append(new_row)
         return Relation(name="", columns=columns, rows=rows)
 
     def _intersect(self, left: Relation, right: Relation) -> Relation:
-        self._check_same_columns(left, right)
-        columns = list(left.columns)
-        right_keys = set()
-        for row in right.rows:
-            right_keys.add(self._row_key(row, columns))
+        columns, right_rows = self._normalize_set_operands(left, right)
+        right_keys = {self._row_key(row, columns) for row in right_rows}
 
         rows = []
         seen = set()
@@ -171,15 +178,12 @@ class QueryExecutor:
             key = self._row_key(row, columns)
             if key in right_keys and key not in seen:
                 seen.add(key)
-                rows.append(dict(row))
+                rows.append({col: row.get(col) for col in columns})
         return Relation(name="", columns=columns, rows=rows)
 
     def _difference(self, left: Relation, right: Relation) -> Relation:
-        self._check_same_columns(left, right)
-        columns = list(left.columns)
-        right_keys = set()
-        for row in right.rows:
-            right_keys.add(self._row_key(row, columns))
+        columns, right_rows = self._normalize_set_operands(left, right)
+        right_keys = {self._row_key(row, columns) for row in right_rows}
 
         rows = []
         seen = set()
@@ -187,7 +191,7 @@ class QueryExecutor:
             key = self._row_key(row, columns)
             if key not in right_keys and key not in seen:
                 seen.add(key)
-                rows.append(dict(row))
+                rows.append({col: row.get(col) for col in columns})
         return Relation(name="", columns=columns, rows=rows)
 
     def _aggregate(self, relation: Relation, spec: str) -> Relation:

@@ -23,7 +23,7 @@ class QueryParser:
         i = 0
         while i < len(query):
             c = query[i]
-            if c == " ":
+            if c.isspace():
                 i += 1
             elif c in "(),":
                 tokens.append(c)
@@ -36,7 +36,7 @@ class QueryParser:
                 i = end + 1
             else:
                 start = i
-                while i < len(query) and query[i] not in "()[], ":
+                while i < len(query) and not query[i].isspace() and query[i] not in "()[],":
                     i += 1
                 tokens.append(query[start:i])
         return tokens

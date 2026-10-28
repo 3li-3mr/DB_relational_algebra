@@ -13,7 +13,7 @@ class Condition:
         i = 0
         while i < len(text):
             c = text[i]
-            if c == " ":
+            if c.isspace():
                 i += 1
             elif c == "(" or c == ")":
                 tokens.append(("paren", c))
@@ -34,7 +34,7 @@ class Condition:
                 tokens.append(("op", op))
             else:
                 start = i
-                while i < len(text) and text[i] not in " ()'\"<>=!":
+                while i < len(text) and not text[i].isspace() and text[i] not in "()'\"<>=!":
                     i += 1
                 word = text[start:i]
                 if word.upper() in ["AND", "OR", "NOT"]:
@@ -144,6 +144,7 @@ class Condition:
             return left >= right
         except TypeError:
             return False
+
     def get_value(self, operand, row: dict):
         kind, value = operand
         if kind == "value":
